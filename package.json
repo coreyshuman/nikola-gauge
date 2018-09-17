@@ -1,0 +1,33 @@
+{
+  "name": "nikola-gauge",
+  "version": "1.0.0",
+  "description": "Custom animated Gauge for upcoming project.",
+  "main": "webpack.config.js",
+  "devDependencies": {
+    "@types/node": "^8.0.53",
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "typescript": "^2.6.2",
+    "webpack": "^3.8.1"
+  },
+  "scripts": {
+    "clean": "yarn run clean-build-steps && rm -rf dist",
+    "tsc": "./node_modules/.bin/tsc",
+    "babel": "./node_modules/.bin/babel build-tsc --out-dir build-babel --source-maps",
+    "webpack": "webpack && cp public/* dist",
+    "clean-build-steps": "rm -rf build-tsc build-babel",
+    "build": "yarn run clean && yarn run tsc && yarn run babel && yarn run webpack && yarn run clean-build-steps",
+    "build-partial" : "yarn run babel && yarn run webpack && yarn run clean-build-steps",
+    "serve": "yarn run build && http-server dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/coreyshuman/nikola-gauge.git"
+  },
+  "author": "Corey Shuman <corey@coreyshuman.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/coreyshuman/nikola-gauge/issues"
+  },
+  "homepage": "https://github.com/coreyshuman/nikola-gauge#readme"
+}

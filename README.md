@@ -1,6 +1,6 @@
 # Nikola Gauge
 
-Proof of concept animated realtime circular gauge written in Typescript.
+Proof of concept animated realtime circular gauge written in TypeScript.
 
 ![Gauge animation example](/nikola.webp)
 
@@ -14,7 +14,7 @@ Proof of concept animated realtime circular gauge written in Typescript.
 
 # Demo
 
-https://coreyshuman.github.io/nikola-guage/dist
+https://coreyshuman.github.io/nikola-gauge/dist/index.html
 
 The demo currently shows two gauges using different size canvas and different configurations for range and target. The ring becomes red if the value is under target, and green when over. The historical line graph is green when within target and red when outside target range.  
 

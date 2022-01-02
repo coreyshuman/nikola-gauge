@@ -1,16 +1,25 @@
 # Nikola Gauge
-Proof of concept gauge for upcoming projects.
 
-2. Install dependencies - `yarn`
-3. Build and Serve - `yarn run serve`
-5. Visit - `http://127.0.0.1:8080`
+Proof of concept animated realtime circular gauge written in Typescript.
 
+![Gauge animation example](/nikola.webp)
 
-Demo currently shows two gauges using different size canvas and different configurations.  
-Mockup image is included for reference.
+## Features
 
+- Configurable minimum and maximum, target range, font, background, size, label, and colors
+- Circular bar graph showing realtime value
+- Line graph showing historical values
+- Target range highlighted on bar and line graphs
+- Line and bar graph colors change when inside or outside target range
 
-## Files
-- gauge.js - the primary gauge logic
-- canvas.js - middleware for necessary canvas functions
-- driver.js - the api implementation for canvas functionality. This will change depending on platform. Current platform support is HTML5 canvas.
+# Demo
+
+https://coreyshuman.github.io/nikola-guage/dist
+
+The demo currently shows two gauges using different size canvas and different configurations for range and target. The ring becomes red if the value is under target, and green when over. The historical line graph is green when within target and red when outside target range.  
+
+# Running the Project
+
+1. Install dependencies - `yarn`
+1. Build and Serve - `yarn run serve`
+1. Visit - `http://127.0.0.1:8080`

@@ -1,20 +1,22 @@
 
-import { Driver } from './Driver';
 import { IDriver } from '../Interfaces/IDriver';
 import { IGradient } from '../Interfaces/IGradient';
 import { IFont } from '../Interfaces/IFont';
 
 // Middleware file to integrate gauge logic with underlying driver implementations
 export class Canvas {
-    private ctx: any; // this will change depending on driver
-    private width: number;
-    private height: number;
     private driver: IDriver;
 
-    constructor(ctx: any, width: number, height: number) {
-        this.width = width;
-        this.height = height;
-        this.driver = new Driver(ctx, width, height);
+    constructor(driver: IDriver) {
+        this.driver = driver;
+    }
+
+    get width() {
+        return this.driver.width;
+    }
+
+    get height() {
+        return this.driver.height;
     }
 
     // fill background

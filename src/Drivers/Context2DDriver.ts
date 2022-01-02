@@ -6,10 +6,10 @@ import { Util } from '../Common/Util';
 // example driver for html canvas implementation.
 // "ctx" is our drawing context
 
-export class Driver implements IDriver {
+export class Context2DDriver implements IDriver {
     private ctx: CanvasRenderingContext2D;
-    private width: number;
-    private height: number;
+    readonly width: number;
+    readonly height: number;
 
     constructor(ctx: CanvasRenderingContext2D, width: number, height: number) {
         this.ctx = ctx;

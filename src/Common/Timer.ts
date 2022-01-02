@@ -7,12 +7,14 @@ export class Timer {
     private handle: number;
     private eventHandler: TimerEventHandler;
 
-    constructor(interval: number) {
+    constructor(interval: number, eventHandler?: TimerEventHandler, enabled?: boolean) {
         this.interval = interval;
-        this.enabled = false;
+        
 
         this.handle = INVALID_HANDLE;
-        this.eventHandler = null;
+        this.eventHandler = eventHandler ?? null;
+        this.Enabled = eventHandler && enabled;
+        console.log('timer ' + interval + ' ' + this.enabled);
     }
 
     get Interval(): number {

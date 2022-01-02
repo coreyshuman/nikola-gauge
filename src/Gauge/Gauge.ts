@@ -6,6 +6,7 @@ import { Tuple } from '../Common/Tuple';
 import { Util } from '../Common/Util';
 import { Canvas } from './Canvas';
 import { Timer } from '../Common/Timer';
+import { IDriver } from '../Interfaces/IDriver';
 
 export default class Gauge {
     static readonly RingGraphColor = '#fe9440';
@@ -49,10 +50,8 @@ export default class Gauge {
     private lineGraphUseAutoSize: boolean;
     private lineGraphUpdateTimer: Timer;
 
-    constructor(ctx: any, width: number, height: number) {
-        this.width = width;
-        this.height = height;
-        this.canvas = new Canvas(ctx, width, height);
+    constructor(driver: IDriver) {
+        this.canvas = new Canvas(driver);
         // animation config
         this.ringGraphDisplayedValue = 0;
         this.value = 0;
@@ -65,22 +64,22 @@ export default class Gauge {
         this.ringGraphAnimationTimer = new Timer(15);
         this.ringGraphAnimationTimer.EventHandler = this.ringGraphAnimationEventHandler.bind(this);
         // default the gauge background
-        this.gradient = new LinearGradient(0, this.height, this.width, 0);
+        this.gradient = new LinearGradient(0, this.canvas.height, this.canvas.width, 0);
         this.gradient.addColorStop(0, Gauge.BackColor1);
         this.gradient.addColorStop(.8, Gauge.BackColor2);
         // default font style
-        this.font = new Font('Arial', `${Math.ceil(this.width * 12/260)}px`, 'lighter');
+        this.font = new Font('Arial', `${Math.ceil(this.canvas.width * 12/260)}px`, 'lighter');
         // default ringGraph graph settings
         this.ringGraphAngleRange = new Tuple<number>(-145, 55);
         this.ringGraphLabelCount = 5;
-        this.ringGraphOrigin = new Tuple<number>(this.width * 0.4, this.height * 0.55);
-        this.ringGraphRadius = this.width * 0.4;
+        this.ringGraphOrigin = new Tuple<number>(this.canvas.width * 0.4, this.canvas.height * 0.55);
+        this.ringGraphRadius = this.canvas.width * 0.4;
         this.ringGraphUnitLabel = 'Watts';
         // default line graph settings
-        this.lineGraphOrigin = new Tuple<number>(this.width * 0.1, this.height * 0.55);
-        this.lineGraphLength = this.width * 0.6;
-        this.lineGraphThickness = 1; //Math.ceil(this.width * (2 / 260));
-        this.lineGraphMaxHeight = this.height * 0.2;
+        this.lineGraphOrigin = new Tuple<number>(this.canvas.width * 0.1, this.canvas.height * 0.55);
+        this.lineGraphLength = this.canvas.width * 0.6;
+        this.lineGraphThickness = 1; //Math.ceil(this.canvas.width * (2 / 260));
+        this.lineGraphMaxHeight = this.canvas.height * 0.2;
         this.lineGraphMaxMagnitude = (this.maximum - this.minimum) / 2;
         this.lineGraphCenterValue = this.maximum - ((this.maximum - this.minimum) / 2);
         this.lineGraphUpdateInterval = 2000;
@@ -108,6 +107,10 @@ export default class Gauge {
 
     set Font(font: IFont) {
         this.font = font;
+    }
+
+    set Label(label: string) {
+        this.ringGraphUnitLabel = label;
     }
 
     get RingGraphUnitLabel(): string {
@@ -244,15 +247,15 @@ export default class Gauge {
         const ringGraphValueIncrement: number = Gauge.getRingLabelIncrement(new Tuple<number>(this.minimum, this.maximum), this.ringGraphLabelCount);
         const ringGraphAngleIncrement: number = (this.ringGraphAngleRange.v2 - this.ringGraphAngleRange.v1) / this.ringGraphLabelCount;
         const ringGraphDisplayValue: number = Gauge.getAngleFromValue(this.ringGraphAngleRange, new Tuple<number>(this.minimum, this.maximum), this.ringGraphDisplayedValue);
-        const ringGraphDisplayColor: string = Gauge.getRingColor(new Tuple<number>(this.minimum, this.maximum), this.ringGraphDisplayedValue);
+        const ringGraphDisplayColor: string = Gauge.getRingColor(new Tuple<number>(this.targetMinimum, this.targetMaximum), this.ringGraphDisplayedValue);
         const ringGraphTargetLowAngle: number = Gauge.getAngleFromValue(this.ringGraphAngleRange, new Tuple<number>(this.minimum, this.maximum), this.targetMaximum);
         const ringGraphTargetHightAngle: number = Gauge.getAngleFromValue(this.ringGraphAngleRange, new Tuple<number>(this.minimum, this.maximum), this.targetMinimum);
         // draw ring graph target area, background, and value arcs.
-        this.canvas.drawArc(this.ringGraphOrigin.v1, this.ringGraphOrigin.v2, this.ringGraphRadius, ringGraphTargetLowAngle, ringGraphTargetHightAngle, Gauge.TargetColor, this.width * (9 / 260));
-        this.canvas.drawArc(this.ringGraphOrigin.v1, this.ringGraphOrigin.v2, this.ringGraphRadius, this.ringGraphAngleRange.v1, this.ringGraphAngleRange.v2, ringGraphDisplayColor, this.width * (5 / 260));
-        this.canvas.drawArc(this.ringGraphOrigin.v1, this.ringGraphOrigin.v2, this.ringGraphRadius, this.ringGraphAngleRange.v1, ringGraphDisplayValue, '#000', this.width * (3 / 260));
+        this.canvas.drawArc(this.ringGraphOrigin.v1, this.ringGraphOrigin.v2, this.ringGraphRadius, ringGraphTargetLowAngle, ringGraphTargetHightAngle, Gauge.TargetColor, this.canvas.width * (9 / 260));
+        this.canvas.drawArc(this.ringGraphOrigin.v1, this.ringGraphOrigin.v2, this.ringGraphRadius, this.ringGraphAngleRange.v1, this.ringGraphAngleRange.v2, ringGraphDisplayColor, this.canvas.width * (5 / 260));
+        this.canvas.drawArc(this.ringGraphOrigin.v1, this.ringGraphOrigin.v2, this.ringGraphRadius, this.ringGraphAngleRange.v1, ringGraphDisplayValue, '#000', this.canvas.width * (3 / 260));
         // draw ringGraph labels
-        this.canvas.writeText(this.width * 0.82, this.height * 0.9, this.font, Gauge.TextColor, this.ringGraphUnitLabel);
+        this.canvas.writeText(this.canvas.width * 0.82, this.canvas.height * 0.9, this.font, Gauge.TextColor, this.ringGraphUnitLabel);
         for(let i = 0; i < this.ringGraphLabelCount; i ++) {
             const label = (firstLabelValue + ringGraphValueIncrement * i).toString();
             const labelLocation: Tuple<number> = Gauge.getRingLabelLocation(this.ringGraphOrigin, this.ringGraphRadius * 1.125, this.ringGraphAngleRange.v2 - (ringGraphAngleIncrement * i));
@@ -270,11 +273,9 @@ export default class Gauge {
             const x = this.lineGraphOrigin.v1 + this.lineGraphLength - index;
             displayValue = Gauge.getBoundValue(new Tuple<number>(this.lineGraphCenterValue - this.lineGraphMaxMagnitude, this.lineGraphCenterValue + this.lineGraphMaxMagnitude), displayValue);
             const graphOffset = Gauge.getLineOffsetFromValue(this.lineGraphMaxHeight, this.lineGraphMaxMagnitude, this.lineGraphCenterValue, displayValue);
-            console.log(displayValue, graphOffset);
             const y = this.lineGraphOrigin.v2 - graphOffset; // invert so up is positive
             if(prevPoint !== null) {
                 const fillColor: string = (displayValue > this.targetMaximum || displayValue < this.targetMinimum) ? Gauge.RedColor : Gauge.GreenColor;
-                console.log(displayValue, this.targetMaximum, this.targetMinimum, fillColor === Gauge.RedColor ? 'red': 'green')
                 this.canvas.drawLine(x, this.lineGraphOrigin.v2, x, y, fillColor, 1);
                 this.canvas.drawLine(prevPoint.v1, prevPoint.v2, x, y, Gauge.LineColor, this.lineGraphThickness);
             }
@@ -304,18 +305,19 @@ export default class Gauge {
     static getAngleFromValue(angleRange: Tuple<number>, valueRange: Tuple<number>, value: number): number {
         return (valueRange.v2 - value) * (angleRange.v2 - angleRange.v1 ) / (valueRange.v2 - valueRange.v1) + angleRange.v1;
     }
+    
     static getRingColor(ringGraphValueRange: Tuple<number>, value: number) {
         const range: number = ringGraphValueRange.v2 - ringGraphValueRange.v1;
         let color: string = Gauge.RingGraphColor;
-        value = value + ringGraphValueRange.v1;
 
-        if(value < range * 0.2) {
+        if(value < ringGraphValueRange.v1) {
             color = Gauge.RedColor;
-        } else if (value > range * 0.8) {
+        } else if (value > ringGraphValueRange.v2) {
             color = Gauge.GreenColor;
         } 
         return color;
     }
+
     static getRingLabelLocation(origin: Tuple<number>, radius: number, angle: number) : Tuple<number> {
         const x: number = radius * Math.cos(Util.d2r(angle)) + origin.v1;
         const y: number = radius * Math.sin(Util.d2r(angle)) + origin.v2;
